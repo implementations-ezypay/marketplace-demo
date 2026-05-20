@@ -3,8 +3,6 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ApiLoggerViewer } from "@/components/api-logger-viewer"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
 import "./globals.css"
 import Provider from "./Provider"
 import { Toaster } from "@/components/toaster"
@@ -12,16 +10,9 @@ import { Toaster } from "@/components/toaster"
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
-  title: "Ezypay Presales Demo",
-  description: "Used to demo the Ezypay API to partners / merchants",
+  title: "Marketplace Demo",
+  description: "A marketplace demo showcasing customer sign-up with Ezypay integration",
   generator: "v0.app",
-}
-
-const getThemeFromStorage = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("theme") || "dark" // Based on your ThemeProvider config
-  }
-  return "dark"
 }
 
 export default function RootLayout({
@@ -30,23 +21,18 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="bg-background" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme={getThemeFromStorage()}
+          defaultTheme="dark"
           enableSystem
         >
           <Provider>
-            <SidebarProvider>
-              <div className="flex h-screen w-full">
-                <AppSidebar />
-                <main className="flex-1 overflow-auto">
-                  {children}
-                  <Toaster />
-                </main>
-              </div>
-            </SidebarProvider>
+            <main className="min-h-screen">
+              {children}
+              <Toaster />
+            </main>
             <ApiLoggerViewer />
           </Provider>
         </ThemeProvider>
