@@ -20,9 +20,8 @@ import { ArrowLeft, CheckCircle2, User, CreditCard, ArrowRight } from "lucide-re
 import { toast } from "sonner"
 import type { CreateCustomer, Customer } from "@/lib/types/customer"
 
-const pcpEndpoint = process.env.NEXT_PUBLIC_PCP_ENDPOINT
-const hppEndpoint = process.env.NEXT_PUBLIC_HPP_ENDPOINT
-const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT || "https://api.ezypay.com"
+// Environment variables are injected by the server when needed
+// Client-side uses relative URLs to route through server actions
 
 type ApiLogEntry = {
   id: string
@@ -76,7 +75,7 @@ export default function SignUpPage() {
     onMutate: (variables) => {
       addLog({
         method: "POST",
-        url: `${apiEndpoint}/v2/billing/customers`,
+        url: `/api/customers`,
         requestBody: variables.customerData,
         status: 0,
         step: "Creating Customer",
@@ -96,7 +95,7 @@ export default function SignUpPage() {
       })
       logApiCall(
         "POST",
-        `${apiEndpoint}/v2/billing/customers`,
+        `/api/customers`,
         data,
         201,
         { firstName: formData.firstName, lastName: formData.lastName, email: formData.email }
@@ -126,8 +125,8 @@ export default function SignUpPage() {
     onMutate: () => {
       addLog({
         method: "POST",
-        url: `${apiEndpoint}/v2/oauth/token`,
-        requestBody: { grant_type: "client_credentials" },
+        url: `https://identity-sandbox.ezypay.com/token`,
+        requestBody: { grant_type: "password" },
         status: 0,
         step: "Getting OAuth Token",
       })
@@ -147,8 +146,8 @@ export default function SignUpPage() {
       const custId = input?.customerId || customerId
       const pcpUrl =
         country === "PH"
-          ? `${hppEndpoint}/paymentmethod/embed?token=${token}&countryCode=${country}`
-          : `${pcpEndpoint}/paymentmethod/embed?token=${token}&feepricing=true&submitbutton=true${
+          ? `${process.env.NEXT_PUBLIC_HPP_ENDPOINT}/paymentmethod/embed?token=${token}&countryCode=${country}`
+          : `${process.env.NEXT_PUBLIC_PCP_ENDPOINT}/paymentmethod/embed?token=${token}&feepricing=true&submitbutton=true${
               custId ? "&customerId=" + custId : ""
             }`
       setIframeUrl(pcpUrl)
@@ -188,7 +187,7 @@ export default function SignUpPage() {
     onMutate: (variables) => {
       addLog({
         method: "POST",
-        url: `${apiEndpoint}/v2/billing/customers/${variables.customerId}/paymentmethods`,
+        url: `/api/customers/${variables.customerId}/paymentmethods`,
         requestBody: { paymentMethodToken: variables.paymentMethodToken },
         status: 0,
         step: "Linking Payment Method",
